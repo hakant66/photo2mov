@@ -1,0 +1,5 @@
+/photo_to_mov
+/*.mov
+__pycache__/
+*.pyc
+/outputs/

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo To MOV</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Photo To MOV</p>
+        <h1>Turn one product image into a polished 5 second `.mov`.</h1>
+        <p class="lede">
+          The web app uses the existing native renderer: subtle eased zoom, clean lens feel, center-focused highlight,
+          no pan, no blur, no rotation.
+        </p>
+      </section>
+
+      <section class="panel">
+        <form id="path-form" class="upload-form">
+          <label class="field">
+            <span class="field-label">Source Photo Path</span>
+            <input
+              id="source-path"
+              name="source_path"
+              class="text-input"
+              type="text"
+              placeholder="/Users/hakantaskin/path/to/photo.jpg"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <span class="field-copy">Enter the real Mac file path to the source photo.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Output Folder</span>
+            <input
+              id="output-dir"
+              name="output_dir"
+              class="text-input"
+              type="text"
+              placeholder="Leave blank to save beside the source photo"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <span class="field-copy">Optional. Leave blank to create the `.mov` in the same folder as the source photo.</span>
+          </label>
+
+          <div class="specs">
+            <div>
+              <span class="spec-label">Duration</span>
+              <strong>5 seconds</strong>
+            </div>
+            <div>
+              <span class="spec-label">Zoom</span>
+              <strong>100% → 111%</strong>
+            </div>
+            <div>
+              <span class="spec-label">Output</span>
+              <strong>QuickTime `.mov`</strong>
+            </div>
+          </div>
+
+          <button id="submit-button" class="submit-button" type="submit">Create Movie</button>
+        </form>
+
+        <div id="status" class="status" aria-live="polite"></div>
+
+        <section id="result-card" class="result-card" hidden>
+          <div class="result-copy">
+            <p class="result-label">Created Movie</p>
+            <h2 id="result-name" class="result-name"></h2>
+            <p id="result-source" class="result-source"></p>
+            <p id="result-path" class="result-path"></p>
+            <div class="result-actions">
+              <a id="open-link" class="result-link" href="#" target="_blank" rel="noopener">Open Movie</a>
+              <a id="download-link" class="result-link result-link-secondary" href="#" download>Download Movie</a>
+            </div>
+          </div>
+
+          <div class="player-shell">
+            <video id="result-player" class="result-player" controls preload="metadata"></video>
+            <p class="player-note">
+              If inline playback is not supported by your browser, use <strong>Open Movie</strong> or
+              <strong>Download Movie</strong>.
+            </p>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

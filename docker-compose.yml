@@ -1,0 +1,13 @@
+services:
+  photo-to-mov:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${HOME}:${HOME}
+    environment:
+      GENERATOR_BACKEND: ffmpeg
+      HOST: 0.0.0.0
+      PORT: 8000
+      DEFAULT_OUTPUT_DIR: /Users/hakantaskin/Library/CloudStorage/GoogleDrive-taskin.baba@gmail.com/Other computers/TASKIN_LAPTOP/Etsy/E31T/Etsy
