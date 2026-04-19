@@ -16,7 +16,6 @@ GENERATOR_SOURCE = ROOT / "photo_to_mov.m"
 
 FPS = 60
 DURATION_SECONDS = 5
-TOTAL_FRAMES = FPS * DURATION_SECONDS
 START_SCALE = 1.0
 END_SCALE = 1.11
 TARGET_VIDEO_BITRATE = "20M"
@@ -52,12 +51,17 @@ def ensure_generator_ready() -> None:
     raise RuntimeError(f"Unsupported generator backend: {backend}")
 
 
-def generate_movie(input_path: Path) -> Path:
+def generate_movie(
+    input_path: Path,
+    duration_seconds: float = DURATION_SECONDS,
+    start_scale: float = START_SCALE,
+    end_scale: float = END_SCALE,
+) -> Path:
     backend = get_backend_name()
     if backend == "native":
-        return _generate_movie_native(input_path)
+        return _generate_movie_native(input_path, duration_seconds, start_scale, end_scale)
     if backend == "ffmpeg":
-        return _generate_movie_ffmpeg(input_path)
+        return _generate_movie_ffmpeg(input_path, duration_seconds, start_scale, end_scale)
     raise RuntimeError(f"Unsupported generator backend: {backend}")
 
 
@@ -84,9 +88,17 @@ def _ensure_ffmpeg_ready() -> None:
         raise RuntimeError(f"Missing required command(s): {', '.join(missing)}")
 
 
-def _generate_movie_native(input_path: Path) -> Path:
+def _generate_movie_native(
+    input_path: Path,
+    duration_seconds: float,
+    start_scale: float,
+    end_scale: float,
+) -> Path:
+    duration_arg = f"{duration_seconds:.6f}"
+    start_scale_arg = f"{start_scale:.6f}"
+    end_scale_arg = f"{end_scale:.6f}"
     result = subprocess.run(
-        [str(GENERATOR_BINARY), str(input_path)],
+        [str(GENERATOR_BINARY), str(input_path), duration_arg, start_scale_arg, end_scale_arg],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -155,12 +167,12 @@ def _masked_focus_filter(width: int, height: int) -> str:
     )
 
 
-def _zoom_filter(width: int, height: int) -> str:
-    duration = f"{DURATION_SECONDS:.6f}"
-    zoom_delta = END_SCALE - START_SCALE
+def _zoom_filter(width: int, height: int, duration_seconds: float, start_scale: float, end_scale: float) -> str:
+    duration = f"{duration_seconds:.6f}"
+    zoom_delta = end_scale - start_scale
     progress_expr = f"clip(t/{duration}\\,0\\,1)"
     zoom_expr = (
-        f"{START_SCALE}+{zoom_delta}*"
+        f"{start_scale}+{zoom_delta}*"
         f"(3*pow({progress_expr}\\,2)-2*pow({progress_expr}\\,3))"
     )
     return (
@@ -176,10 +188,16 @@ def _zoom_filter(width: int, height: int) -> str:
     )
 
 
-def _generate_movie_ffmpeg(input_path: Path) -> Path:
+def _generate_movie_ffmpeg(
+    input_path: Path,
+    duration_seconds: float,
+    start_scale: float,
+    end_scale: float,
+) -> Path:
     width, height = _probe_dimensions(input_path)
     output_path = input_path.with_suffix(".mov")
-    filter_complex = _masked_focus_filter(width, height) + _zoom_filter(width, height)
+    total_frames = max(int(round(FPS * duration_seconds)), 1)
+    filter_complex = _masked_focus_filter(width, height) + _zoom_filter(width, height, duration_seconds, start_scale, end_scale)
 
     result = subprocess.run(
         [
@@ -193,7 +211,7 @@ def _generate_movie_ffmpeg(input_path: Path) -> Path:
             "-framerate",
             str(FPS),
             "-t",
-            str(DURATION_SECONDS),
+            f"{duration_seconds:.6f}",
             "-i",
             str(input_path),
             "-filter_complex",
@@ -201,7 +219,7 @@ def _generate_movie_ffmpeg(input_path: Path) -> Path:
             "-map",
             "[outv]",
             "-frames:v",
-            str(TOTAL_FRAMES),
+            str(total_frames),
             "-an",
             "-c:v",
             "libx264",

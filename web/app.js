@@ -1,6 +1,9 @@
 const form = document.querySelector("#path-form");
 const sourcePathInput = document.querySelector("#source-path");
 const outputDirInput = document.querySelector("#output-dir");
+const durationSecondsInput = document.querySelector("#duration-seconds");
+const startScaleInput = document.querySelector("#start-scale");
+const endScaleInput = document.querySelector("#end-scale");
 const statusNode = document.querySelector("#status");
 const submitButton = document.querySelector("#submit-button");
 const resultCard = document.querySelector("#result-card");
@@ -41,6 +44,10 @@ function showResult(payload) {
   resultCard.hidden = false;
 }
 
+function percentFromScale(scale) {
+  return String((Number(scale) * 100).toFixed(2)).replace(/\.00$/, "");
+}
+
 async function loadConfig() {
   try {
     const response = await fetch("/config");
@@ -48,8 +55,17 @@ async function loadConfig() {
       return;
     }
     const config = await response.json();
-    if (!outputDirInput.value.trim() && config.default_output_dir) {
+    if (config.default_output_dir) {
       outputDirInput.value = config.default_output_dir;
+    }
+    if (config.default_duration_seconds) {
+      durationSecondsInput.value = config.default_duration_seconds;
+    }
+    if (config.default_start_scale) {
+      startScaleInput.value = percentFromScale(config.default_start_scale);
+    }
+    if (config.default_end_scale) {
+      endScaleInput.value = percentFromScale(config.default_end_scale);
     }
   } catch {
     // Ignore config bootstrap failures and keep the form usable.
@@ -75,6 +91,9 @@ form.addEventListener("submit", async (event) => {
   const payload = {
     source_path: sourcePathInput.value.trim(),
     output_dir: outputDirInput.value.trim(),
+    duration_seconds: Number(durationSecondsInput.value),
+    start_scale: Number(startScaleInput.value) / 100,
+    end_scale: Number(endScaleInput.value) / 100,
   };
 
   submitButton.disabled = true;

@@ -73,6 +73,12 @@ h1 {
   gap: 20px;
 }
 
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -262,6 +268,10 @@ h1 {
   .shell {
     width: min(100% - 20px, 960px);
     padding: 28px 0 44px;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
   }
 
   .panel {

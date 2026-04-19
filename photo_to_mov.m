@@ -7,9 +7,9 @@
 #import <ImageIO/ImageIO.h>
 
 static const int32_t kFramesPerSecond = 60;
-static const double kDurationSeconds = 5.0;
-static const CGFloat kStartScale = 1.0;
-static const CGFloat kEndScale = 1.11;
+static const double kDefaultDurationSeconds = 5.0;
+static const CGFloat kDefaultStartScale = 1.0;
+static const CGFloat kDefaultEndScale = 1.11;
 static const float kHighlightExposure = 0.3f;
 static const float kHighlightContrast = 1.12f;
 static const float kHighlightSharpness = 0.45f;
@@ -153,7 +153,7 @@ static BOOL LoadImageAtURL(NSURL *url, CIImage **outImage, CGRect *outRect, NSEr
     return YES;
 }
 
-static BOOL ExportMovie(NSURL *inputURL, NSURL **outURL, NSError **outError) {
+static BOOL ExportMovie(NSURL *inputURL, double durationSeconds, CGFloat startScale, CGFloat endScale, NSURL **outURL, NSError **outError) {
     CIImage *sourceImage = nil;
     CGRect rect = CGRectZero;
     if (!LoadImageAtURL(inputURL, &sourceImage, &rect, outError)) {
@@ -239,7 +239,7 @@ static BOOL ExportMovie(NSURL *inputURL, NSURL **outURL, NSError **outError) {
 
     CIContext *context = [CIContext contextWithOptions:nil];
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    NSInteger totalFrames = (NSInteger)(kDurationSeconds * (double)kFramesPerSecond);
+    NSInteger totalFrames = MAX((NSInteger)(durationSeconds * (double)kFramesPerSecond + 0.5), 1);
     CIImage *mask = CenterMask(rect);
 
     for (NSInteger frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
@@ -262,7 +262,7 @@ static BOOL ExportMovie(NSURL *inputURL, NSURL **outURL, NSError **outError) {
         CGFloat denominator = (CGFloat)MAX(totalFrames - 1, 1);
         CGFloat progress = (CGFloat)frameIndex / denominator;
         CGFloat eased = SmoothStep(progress);
-        CGFloat scale = kStartScale + ((kEndScale - kStartScale) * eased);
+        CGFloat scale = startScale + ((endScale - startScale) * eased);
 
         @autoreleasepool {
             CIImage *frameImage = MakeFrame(sourceImage, rect, mask, scale);
@@ -316,6 +316,9 @@ static BOOL ExportMovie(NSURL *inputURL, NSURL **outURL, NSError **outError) {
 int main(int argc, const char *argv[]) {
     @autoreleasepool {
         NSString *inputPath = nil;
+        double durationSeconds = kDefaultDurationSeconds;
+        CGFloat startScale = kDefaultStartScale;
+        CGFloat endScale = kDefaultEndScale;
 
         if (argc > 1) {
             inputPath = ExpandPath([NSString stringWithUTF8String:argv[1]]);
@@ -327,8 +330,26 @@ int main(int argc, const char *argv[]) {
             }
         }
 
+        if (argc > 2) {
+            durationSeconds = atof(argv[2]);
+        }
+        if (argc > 3) {
+            startScale = atof(argv[3]);
+        }
+        if (argc > 4) {
+            endScale = atof(argv[4]);
+        }
+
         if (inputPath == nil || inputPath.length == 0) {
             fprintf(stderr, "Error: No input image path was provided.\n");
+            return 1;
+        }
+        if (durationSeconds <= 0.0) {
+            fprintf(stderr, "Error: Duration must be greater than zero.\n");
+            return 1;
+        }
+        if (startScale <= 0.0 || endScale <= 0.0) {
+            fprintf(stderr, "Error: Zoom values must be greater than zero.\n");
             return 1;
         }
 
@@ -340,7 +361,7 @@ int main(int argc, const char *argv[]) {
 
         NSURL *inputURL = [NSURL fileURLWithPath:inputPath];
         NSError *error = nil;
-        if (!ExportMovie(inputURL, NULL, &error)) {
+        if (!ExportMovie(inputURL, durationSeconds, startScale, endScale, NULL, &error)) {
             fprintf(stderr, "Error: %s\n", error.localizedDescription.UTF8String);
             return 1;
         }

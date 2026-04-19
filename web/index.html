@@ -49,6 +49,53 @@
             <span class="field-copy">Optional. Leave blank to create the `.mov` in the same folder as the source photo.</span>
           </label>
 
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label">Duration (seconds)</span>
+              <input
+                id="duration-seconds"
+                name="duration_seconds"
+                class="text-input"
+                type="number"
+                min="0.1"
+                step="0.1"
+                value="5"
+                required
+              />
+              <span class="field-copy">Default: 5 seconds.</span>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Zoom Start (%)</span>
+              <input
+                id="start-scale"
+                name="start_scale"
+                class="text-input"
+                type="number"
+                min="1"
+                step="0.1"
+                value="100"
+                required
+              />
+              <span class="field-copy">Default: 100%.</span>
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Zoom End (%)</span>
+            <input
+              id="end-scale"
+              name="end_scale"
+              class="text-input"
+              type="number"
+              min="1"
+              step="0.1"
+              value="111"
+              required
+            />
+            <span class="field-copy">Default: 111%.</span>
+          </label>
+
           <div class="specs">
             <div>
               <span class="spec-label">Duration</span>

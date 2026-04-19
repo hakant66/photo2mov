@@ -24,6 +24,9 @@ DEFAULT_OUTPUT_DIR = os.environ.get(
     "DEFAULT_OUTPUT_DIR",
     "/Users/hakantaskin/Library/CloudStorage/GoogleDrive-taskin.baba@gmail.com/Other computers/TASKIN_LAPTOP/Etsy/E31T/Etsy",
 ).strip()
+DEFAULT_DURATION_SECONDS = float(os.environ.get("DEFAULT_DURATION_SECONDS", "5").strip())
+DEFAULT_START_SCALE = float(os.environ.get("DEFAULT_START_SCALE", "1.0").strip())
+DEFAULT_END_SCALE = float(os.environ.get("DEFAULT_END_SCALE", "1.11").strip())
 GENERATED_FILES: dict[str, Path] = {}
 
 
@@ -31,7 +34,7 @@ def expand_user_path(raw_path: str) -> Path:
     return Path(raw_path.strip()).expanduser()
 
 
-def parse_request_payload(handler: BaseHTTPRequestHandler) -> tuple[str, str]:
+def parse_request_payload(handler: BaseHTTPRequestHandler) -> tuple[str, str, float, float, float]:
     content_length = int(handler.headers.get("Content-Length", "0"))
     if content_length <= 0:
         raise ValueError("No request body was received.")
@@ -44,9 +47,16 @@ def parse_request_payload(handler: BaseHTTPRequestHandler) -> tuple[str, str]:
 
     source_path = str(payload.get("source_path", "")).strip()
     output_dir = str(payload.get("output_dir", "")).strip()
+    duration_seconds = float(str(payload.get("duration_seconds", DEFAULT_DURATION_SECONDS)).strip())
+    start_scale = float(str(payload.get("start_scale", DEFAULT_START_SCALE)).strip())
+    end_scale = float(str(payload.get("end_scale", DEFAULT_END_SCALE)).strip())
     if not source_path:
         raise ValueError("Enter a source photo path.")
-    return source_path, output_dir
+    if duration_seconds <= 0:
+        raise ValueError("Duration must be greater than zero.")
+    if start_scale <= 0 or end_scale <= 0:
+        raise ValueError("Zoom values must be greater than zero.")
+    return source_path, output_dir, duration_seconds, start_scale, end_scale
 
 
 def resolve_source_path(raw_path: str) -> Path:
@@ -87,12 +97,18 @@ def register_generated_file(file_path: Path) -> dict[str, str]:
     }
 
 
-def create_movie_from_source(source_path: Path, output_dir: Path) -> Path:
+def create_movie_from_source(
+    source_path: Path,
+    output_dir: Path,
+    duration_seconds: float,
+    start_scale: float,
+    end_scale: float,
+) -> Path:
     with tempfile.TemporaryDirectory(prefix="photo-to-mov-") as temp_dir:
         temp_root = Path(temp_dir)
         temp_source = temp_root / source_path.name
         shutil.copy2(source_path, temp_source)
-        temp_output = generate_movie(temp_source)
+        temp_output = generate_movie(temp_source, duration_seconds, start_scale, end_scale)
         final_output = build_output_path(source_path, output_dir)
         if final_output.exists():
             final_output.unlink()
@@ -119,6 +135,9 @@ class PhotoToMovHandler(BaseHTTPRequestHandler):
                 HTTPStatus.OK,
                 {
                     "default_output_dir": DEFAULT_OUTPUT_DIR,
+                    "default_duration_seconds": f"{DEFAULT_DURATION_SECONDS:g}",
+                    "default_start_scale": f"{DEFAULT_START_SCALE:g}",
+                    "default_end_scale": f"{DEFAULT_END_SCALE:g}",
                 },
             )
             return
@@ -196,7 +215,7 @@ class PhotoToMovHandler(BaseHTTPRequestHandler):
 
         try:
             ensure_generator_ready()
-            source_path_text, output_dir_text = parse_request_payload(self)
+            source_path_text, output_dir_text, duration_seconds, start_scale, end_scale = parse_request_payload(self)
             source_path = resolve_source_path(source_path_text)
             output_dir = resolve_output_dir(output_dir_text, source_path)
         except ValueError as exc:
@@ -210,9 +229,12 @@ class PhotoToMovHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            output_path = create_movie_from_source(source_path, output_dir)
+            output_path = create_movie_from_source(source_path, output_dir, duration_seconds, start_scale, end_scale)
             response_payload = register_generated_file(output_path)
             response_payload["source_path"] = str(source_path)
+            response_payload["duration_seconds"] = f"{duration_seconds:g}"
+            response_payload["start_scale"] = f"{start_scale:g}"
+            response_payload["end_scale"] = f"{end_scale:g}"
             self.respond_json(HTTPStatus.OK, response_payload)
         except RuntimeError as exc:
             self.respond_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})

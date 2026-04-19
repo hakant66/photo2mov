@@ -29,6 +29,9 @@ docker-run:
 		-e GENERATOR_BACKEND=ffmpeg \
 		-e HOST=0.0.0.0 \
 		-e PORT=8000 \
+		-e DEFAULT_DURATION_SECONDS=5 \
+		-e DEFAULT_START_SCALE=1.0 \
+		-e DEFAULT_END_SCALE=1.11 \
 		-e DEFAULT_OUTPUT_DIR="/Users/hakantaskin/Library/CloudStorage/GoogleDrive-taskin.baba@gmail.com/Other computers/TASKIN_LAPTOP/Etsy/E31T/Etsy" \
 		photo-to-mov-web
 

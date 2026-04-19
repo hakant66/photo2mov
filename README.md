@@ -15,6 +15,12 @@ Both rendering paths produce a 5 second `.mov` with:
 - Original image resolution preserved
 - QuickTime output encoded as H.264 to keep the file size low
 
+The web UI exposes the render controls as variables:
+
+- Duration in seconds, default `5`
+- Zoom start percentage, default `100`
+- Zoom end percentage, default `111`
+
 ## Build
 
 ```bash
@@ -59,6 +65,7 @@ Enter a real local source photo path in the browser and the app will:
 
 - Read that file directly from disk
 - Save the generated `.mov` either beside the source file or into the output folder you enter
+- Use the duration and zoom values you enter in the form
 - Show the created filename, source path, and full `.mov` path in the UI
 - Expose the result as a clickable movie link and inline player attempt in the UI
 - Prefill the output folder with your Google Drive Etsy folder by default
