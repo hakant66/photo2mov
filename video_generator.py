@@ -27,6 +27,21 @@ def _which_or_none(name: str) -> str | None:
     return shutil.which(name)
 
 
+def _format_process_failure(tool_name: str, result: subprocess.CompletedProcess[str], input_path: Path, fallback: str) -> str:
+    code = result.returncode
+    if code < 0:
+        exit_info = f"signal {-code}"
+    else:
+        exit_info = f"code {code}"
+
+    stderr = result.stderr.strip()
+    stdout = result.stdout.strip()
+    detail = stderr or stdout
+    if detail:
+        return f"{tool_name} failed ({exit_info}) for input {input_path}: {detail}"
+    return f"{fallback} ({tool_name} {exit_info}) for input {input_path}."
+
+
 def _requested_backend() -> str:
     return os.environ.get("GENERATOR_BACKEND", "auto").strip().lower()
 
@@ -104,7 +119,12 @@ def _generate_movie_native(
         text=True,
     )
     if result.returncode != 0:
-        message = result.stderr.strip() or result.stdout.strip() or "Generation failed."
+        message = _format_process_failure(
+            "native renderer",
+            result,
+            input_path,
+            "Generation failed with no native renderer output",
+        )
         raise RuntimeError(message)
 
     output_path = input_path.with_suffix(".mov")
@@ -131,7 +151,7 @@ def _probe_dimensions(input_path: Path) -> tuple[int, int]:
         text=True,
     )
     if result.returncode != 0:
-        message = result.stderr.strip() or result.stdout.strip() or "Unable to inspect the input image."
+        message = _format_process_failure("ffprobe", result, input_path, "Unable to inspect the input image")
         raise RuntimeError(message)
 
     try:
@@ -245,7 +265,12 @@ def _generate_movie_ffmpeg(
         text=True,
     )
     if result.returncode != 0:
-        message = result.stderr.strip() or result.stdout.strip() or "Generation failed."
+        message = _format_process_failure(
+            "ffmpeg",
+            result,
+            input_path,
+            "Generation failed with no ffmpeg output",
+        )
         raise RuntimeError(message)
 
     if not output_path.exists():

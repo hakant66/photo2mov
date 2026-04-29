@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo To MOV - Convert avif to jpg</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="top-nav" aria-label="Pages">
+        <a class="top-nav-link" href="/index.html">Single Run</a>
+        <a class="top-nav-link" href="/batch.html">Batch run</a>
+        <a class="top-nav-link" href="/single-enhance.html">Single Enhance photo</a>
+        <a class="top-nav-link" href="/enhance.html">Batch Enhance photo</a>
+        <a class="top-nav-link is-active" href="/convert-avif.html">Convert avif to jpg</a>
+      </nav>
+
+      <section class="hero">
+        <p class="eyebrow">Photo To MOV</p>
+        <h1>Convert one AVIF to JPG.</h1>
+        <p class="lede">Enter a full `.avif` source path and convert it to `.jpg` in the same folder.</p>
+      </section>
+
+      <section class="panel">
+        <form id="avif-convert-form" class="upload-form">
+          <label class="field">
+            <span class="field-label">Source AVIF Path</span>
+            <input
+              id="avif-source-path"
+              name="source_path"
+              class="text-input"
+              type="text"
+              placeholder="/Users/hakantaskin/path/to/image.avif"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <span class="field-copy">Enter full AVIF file path or a folder path to convert all AVIF files inside it (recursive).</span>
+          </label>
+
+          <button id="avif-convert-submit-button" class="submit-button" type="submit">Convert to jpg</button>
+        </form>
+
+        <div id="avif-convert-status" class="status" aria-live="polite"></div>
+
+        <section id="avif-convert-result-card" class="result-card result-card-single-column" hidden>
+          <div class="result-copy">
+            <p class="result-label">Conversion Summary</p>
+            <h2 id="avif-convert-result-name" class="result-name"></h2>
+            <p id="avif-convert-result-source" class="result-source"></p>
+
+            <div class="batch-columns">
+              <div>
+                <p class="result-label">Generated</p>
+                <ul id="avif-convert-success-list" class="batch-list"></ul>
+              </div>
+              <div>
+                <p class="result-label">Failed</p>
+                <ul id="avif-convert-failure-list" class="batch-list"></ul>
+              </div>
+            </div>
+
+            <p id="avif-convert-result-path" class="result-path"></p>
+            <div class="result-actions">
+              <a id="avif-convert-open-link" class="result-link" href="#" target="_blank" rel="noopener">Open First Image</a>
+              <a id="avif-convert-download-link" class="result-link result-link-secondary" href="#" download>Download First Image</a>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

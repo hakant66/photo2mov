@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo To MOV - Batch Enhance photo</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="top-nav" aria-label="Pages">
+        <a class="top-nav-link" href="/index.html">Single Run</a>
+        <a class="top-nav-link" href="/batch.html">Batch run</a>
+        <a class="top-nav-link" href="/single-enhance.html">Single Enhance photo</a>
+        <a class="top-nav-link is-active" href="/enhance.html">Batch Enhance photo</a>
+        <a class="top-nav-link" href="/convert-avif.html">Convert avif to jpg</a>
+      </nav>
+
+      <section class="hero">
+        <p class="eyebrow">Photo To MOV</p>
+        <h1>Enhance Etsy photos in batch.</h1>
+        <p class="lede">
+          The tool scans a main folder up to 3 nested subfolder levels, finds <code>Etsy/1.png</code>, <code>Etsy/1.jpg</code>, or
+          <code>Etsy/1.jpeg</code>, and creates <code>1_etsy.jpg</code> in the same Etsy folder.
+        </p>
+      </section>
+
+      <section class="panel">
+        <form id="enhance-form" class="upload-form">
+          <label class="field">
+            <span class="field-label">Main Folder Path</span>
+            <input
+              id="enhance-main-dir"
+              name="main_dir"
+              class="text-input"
+              type="text"
+              placeholder="/Users/hakantaskin/path/to/main-folder"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <span class="field-copy">The scan includes subfolders down to 3 levels and only processes Etsy folders.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Images To Process</span>
+            <input
+              id="enhance-max-images"
+              name="max_images"
+              class="text-input"
+              type="number"
+              min="1"
+              step="1"
+              value="10"
+              required
+            />
+            <span class="field-copy">Set how many matched images should be processed in this run.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Resolution (WIDTHxHEIGHT)</span>
+            <input
+              id="enhance-resolution"
+              name="resolution"
+              class="text-input"
+              type="text"
+              value="2000x2000"
+              placeholder="2000x2000"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <span class="field-copy">Default Etsy output resolution and quality target is 2000x2000.</span>
+          </label>
+
+          <div class="button-row">
+            <button id="enhance-submit-button" class="submit-button" type="submit">Start Enhance Batch</button>
+            <button id="enhance-stop-button" class="submit-button button-secondary" type="button" disabled>Stop Batch</button>
+          </div>
+        </form>
+
+        <div id="enhance-status" class="status" aria-live="polite"></div>
+        <pre id="enhance-log" class="log-box" aria-live="polite"></pre>
+
+        <section id="enhance-result-card" class="result-card result-card-single-column" hidden>
+          <div class="result-copy">
+            <p class="result-label">Enhance Summary</p>
+            <h2 id="enhance-result-summary" class="result-name"></h2>
+            <p id="enhance-result-main-dir" class="result-source"></p>
+
+            <div class="batch-columns">
+              <div>
+                <p class="result-label">Enhanced</p>
+                <ul id="enhance-success-list" class="batch-list"></ul>
+              </div>
+              <div>
+                <p class="result-label">Failed</p>
+                <ul id="enhance-failure-list" class="batch-list"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

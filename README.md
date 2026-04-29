@@ -70,6 +70,67 @@ Enter a real local source photo path in the browser and the app will:
 - Expose the result as a clickable movie link and inline player attempt in the UI
 - Prefill the output folder with your Google Drive Etsy folder by default
 
+Batch mode is also available at:
+
+```text
+http://127.0.0.1:8000/batch.html
+```
+
+In batch mode, provide:
+
+- One main folder path
+- One or more subfolder names (line-separated or comma-separated)
+- The same duration and zoom settings
+
+For each subfolder, the app checks `main/subfolder/Etsy/` for `1.png`, `1.jpg`, or `1.jpeg`, then generates or replaces `1.mov` in that same `Etsy` folder.
+
+Enhance photo mode is available at:
+
+```text
+http://127.0.0.1:8000/enhance.html
+```
+
+In enhance mode, provide one main folder path. The app scans all nested subfolders up to 3 levels and processes folders that match:
+
+- `main/<level1>/Etsy`
+- `main/<level1>/<level2>/Etsy`
+- `main/<level1>/<level2>/<level3>/Etsy`
+
+For each matching Etsy folder, it looks for `1.png`, `1.jpg`, or `1.jpeg` and creates/replaces `1_etsy.jpg`.
+
+Enhance mode now runs as an async batch job:
+
+- Enter `Images To Process` to define how many matched images should be processed in that run
+- Enter `Resolution (WIDTHxHEIGHT)` to control output size (default `2000x2000`)
+- See live progress and log messages in the UI while the job is running
+- Use `Stop Batch` to stop gracefully (the current image finishes first, then processing stops)
+
+Single enhance mode is available at:
+
+```text
+http://127.0.0.1:8000/single-enhance.html
+```
+
+In single enhance mode, provide:
+
+- A full source image path (including folder + file name)
+- `Resolution (WIDTHxHEIGHT)` input (default `2000x2000`)
+
+It creates or replaces `1_etsy.jpg` in the same folder as the source image.
+
+AVIF conversion mode is available at:
+
+```text
+http://127.0.0.1:8000/convert-avif.html
+```
+
+Provide either:
+
+- A full `.avif` source file path to convert one file, or
+- A folder path to convert all `.avif` files under that folder (recursive)
+
+The output keeps the same base name and writes `.jpg` beside each source file, overriding existing `.jpg` files with the same name.
+
 Notes:
 
 - On macOS, the web server rebuilds `photo_to_mov` automatically if the source changed

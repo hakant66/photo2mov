@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo To MOV - Single Enhance photo</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="top-nav" aria-label="Pages">
+        <a class="top-nav-link" href="/index.html">Single Run</a>
+        <a class="top-nav-link" href="/batch.html">Batch run</a>
+        <a class="top-nav-link is-active" href="/single-enhance.html">Single Enhance photo</a>
+        <a class="top-nav-link" href="/enhance.html">Batch Enhance photo</a>
+        <a class="top-nav-link" href="/convert-avif.html">Convert avif to jpg</a>
+      </nav>
+
+      <section class="hero">
+        <p class="eyebrow">Photo To MOV</p>
+        <h1>Enhance one Etsy photo.</h1>
+        <p class="lede">
+          Enter a full source image path, set output resolution, and create <code>1_etsy.jpg</code> in the same folder with Etsy
+          quality.
+        </p>
+      </section>
+
+      <section class="panel">
+        <form id="single-enhance-form" class="upload-form">
+          <label class="field">
+            <span class="field-label">Source Image Path</span>
+            <input
+              id="single-enhance-source-path"
+              name="source_path"
+              class="text-input"
+              type="text"
+              placeholder="/Users/hakantaskin/path/to/1.png"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <span class="field-copy">Enter full path including folder and file name.</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Resolution (WIDTHxHEIGHT)</span>
+            <input
+              id="single-enhance-resolution"
+              name="resolution"
+              class="text-input"
+              type="text"
+              value="2000x2000"
+              placeholder="2000x2000"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <span class="field-copy">Default Etsy output resolution and quality target is 2000x2000.</span>
+          </label>
+
+          <button id="single-enhance-submit-button" class="submit-button" type="submit">Enhance Photo</button>
+        </form>
+
+        <div id="single-enhance-status" class="status" aria-live="polite"></div>
+
+        <section id="single-enhance-result-card" class="result-card" hidden>
+          <div class="result-copy">
+            <p class="result-label">Enhanced Photo</p>
+            <h2 id="single-enhance-result-name" class="result-name"></h2>
+            <p id="single-enhance-result-source" class="result-source"></p>
+            <p id="single-enhance-result-path" class="result-path"></p>
+            <div class="result-actions">
+              <a id="single-enhance-open-link" class="result-link" href="#" target="_blank" rel="noopener">Open Image</a>
+              <a id="single-enhance-download-link" class="result-link result-link-secondary" href="#" download>Download Image</a>
+            </div>
+          </div>
+
+          <div class="player-shell">
+            <img id="single-enhance-preview" class="result-image" alt="Enhanced Etsy output preview" />
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

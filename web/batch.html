@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Photo To MOV</title>
+    <title>Photo To MOV - Batch run</title>
     <link rel="stylesheet" href="/styles.css" />
     <script defer src="/app.js"></script>
   </head>
   <body>
     <main class="shell">
       <nav class="top-nav" aria-label="Pages">
-        <a class="top-nav-link is-active" href="/index.html">Single Run</a>
-        <a class="top-nav-link" href="/batch.html">Batch run</a>
+        <a class="top-nav-link" href="/index.html">Single Run</a>
+        <a class="top-nav-link is-active" href="/batch.html">Batch run</a>
         <a class="top-nav-link" href="/single-enhance.html">Single Enhance photo</a>
         <a class="top-nav-link" href="/enhance.html">Batch Enhance photo</a>
         <a class="top-nav-link" href="/convert-avif.html">Convert avif to jpg</a>
@@ -19,49 +19,49 @@
 
       <section class="hero">
         <p class="eyebrow">Photo To MOV</p>
-        <h1>Turn one product image into a polished 5 second `.mov`.</h1>
+        <h1>Batch run across Etsy subfolders.</h1>
         <p class="lede">
-          The web app uses the existing native renderer: subtle eased zoom, clean lens feel, center-focused highlight,
-          no pan, no blur, no rotation.
+          For each subfolder, the app checks <code>main/subfolder/Etsy/</code> for <code>1.png</code>, <code>1.jpg</code>, or
+          <code>1.jpeg</code>, then creates or replaces <code>1.mov</code> in the same Etsy folder.
         </p>
       </section>
 
       <section class="panel">
-        <form id="path-form" class="upload-form">
+        <form id="batch-form" class="upload-form">
           <label class="field">
-            <span class="field-label">Source Photo Path</span>
+            <span class="field-label">Main Folder Path</span>
             <input
-              id="source-path"
-              name="source_path"
+              id="batch-main-dir"
+              name="main_dir"
               class="text-input"
               type="text"
-              placeholder="/Users/hakantaskin/path/to/photo.jpg"
+              placeholder="/Users/hakantaskin/path/to/main-folder"
               autocomplete="off"
               spellcheck="false"
               required
             />
-            <span class="field-copy">Enter the real Mac file path to the source photo.</span>
+            <span class="field-copy">Root folder that contains your product subfolders.</span>
           </label>
 
           <label class="field">
-            <span class="field-label">Output Folder</span>
-            <input
-              id="output-dir"
-              name="output_dir"
-              class="text-input"
-              type="text"
-              placeholder="Leave blank to save beside the source photo"
+            <span class="field-label">Subfolder Names</span>
+            <textarea
+              id="batch-subfolders"
+              name="subfolders"
+              class="text-input text-area"
+              placeholder="A001&#10;A002&#10;A003"
               autocomplete="off"
               spellcheck="false"
-            />
-            <span class="field-copy">Optional. Leave blank to create the `.mov` in the same folder as the source photo.</span>
+              required
+            ></textarea>
+            <span class="field-copy">Enter one subfolder per line. Comma-separated values also work.</span>
           </label>
 
           <div class="field-row">
             <label class="field">
               <span class="field-label">Duration (seconds)</span>
               <input
-                id="duration-seconds"
+                id="batch-duration-seconds"
                 name="duration_seconds"
                 class="text-input"
                 type="number"
@@ -76,7 +76,7 @@
             <label class="field">
               <span class="field-label">Zoom Start (%)</span>
               <input
-                id="start-scale"
+                id="batch-start-scale"
                 name="start_scale"
                 class="text-input"
                 type="number"
@@ -92,7 +92,7 @@
           <label class="field">
             <span class="field-label">Zoom End (%)</span>
             <input
-              id="end-scale"
+              id="batch-end-scale"
               name="end_scale"
               class="text-input"
               type="number"
@@ -119,29 +119,28 @@
             </div>
           </div>
 
-          <button id="submit-button" class="submit-button" type="submit">Create Movie</button>
+          <button id="batch-submit-button" class="submit-button" type="submit">Start Batch Run</button>
         </form>
 
-        <div id="status" class="status" aria-live="polite"></div>
+        <div id="batch-status" class="status" aria-live="polite"></div>
+        <pre id="batch-log" class="log-box" aria-live="polite"></pre>
 
-        <section id="result-card" class="result-card" hidden>
+        <section id="batch-result-card" class="result-card result-card-single-column" hidden>
           <div class="result-copy">
-            <p class="result-label">Created Movie</p>
-            <h2 id="result-name" class="result-name"></h2>
-            <p id="result-source" class="result-source"></p>
-            <p id="result-path" class="result-path"></p>
-            <div class="result-actions">
-              <a id="open-link" class="result-link" href="#" target="_blank" rel="noopener">Open Movie</a>
-              <a id="download-link" class="result-link result-link-secondary" href="#" download>Download Movie</a>
-            </div>
-          </div>
+            <p class="result-label">Batch Summary</p>
+            <h2 id="batch-result-summary" class="result-name"></h2>
+            <p id="batch-result-main-dir" class="result-source"></p>
 
-          <div class="player-shell">
-            <video id="result-player" class="result-player" controls preload="metadata"></video>
-            <p class="player-note">
-              If inline playback is not supported by your browser, use <strong>Open Movie</strong> or
-              <strong>Download Movie</strong>.
-            </p>
+            <div class="batch-columns">
+              <div>
+                <p class="result-label">Generated</p>
+                <ul id="batch-success-list" class="batch-list"></ul>
+              </div>
+              <div>
+                <p class="result-label">Failed</p>
+                <ul id="batch-failure-list" class="batch-list"></ul>
+              </div>
+            </div>
           </div>
         </section>
       </section>
